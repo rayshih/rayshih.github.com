@@ -3,7 +3,7 @@ layout: post
 title: "The First Time Setup Server on Linode"
 date: 2012-11-03 13:58
 comments: true
-categories: ["linux", "ubuntu", "rails", "postgresql"]
+categories: ["linux", "ubuntu", "rails", "capistrano", "postgresql"]
 ---
 
 因為發現Heroku實在太貴了，光設定一個HTTPS就要收你20鎂(而且還是每月收)，
@@ -30,8 +30,8 @@ categories: ["linux", "ubuntu", "rails", "postgresql"]
 -----------------
 要安裝的東西及順序如下：
 
-1. curl
-2. git-core (for capistrano)
+1. curl (**UPDATE**: 已包含在rvm requirements)
+2. git-core (for capistrano, **UPDATE**: 已包含在rvm requirements)
 3. python-software-properties
 4. nginx
 5. postgresql (這邊會出現[問題](#install_psql_problem))
@@ -85,6 +85,7 @@ sudo apt-get -y install build-essential openssl libreadline6 libreadline6-dev cu
 3. cap deploy:setup
 4. cap deploy
 	* 如果有github連線的問題，請執行`ssh-add`，這樣ssh agent forward才會成功
+	* 先不要執行cap deploy:cold，因為這步會產生migration，可是database還沒設定
 
 ``` ruby config/deploy.rb
 
@@ -127,7 +128,7 @@ end
 沒錯，不過到這一步就可以把code傳到server上了，差在還不能跑而已。
 下一篇就會接著講如何設定Thin, nginx, database等
 
-(待續)
+[PART II](/blog/2012/11/03/the-first-time-setup-server-on-linode-part-ii/)
 
 ----------
 
