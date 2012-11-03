@@ -3,7 +3,7 @@ layout: post
 title: "Insert jQuery to Any Page"
 date: 2012-11-03 12:20
 comments: true
-categories: 
+categories: ["web", "javascript"]
 ---
 
 最近在寫Crawler爬資料，用的是ruby的gem Nokogiri，但是每次改都要等他跑完才知道結果是不是對的，
