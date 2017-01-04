@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>React Native Performance Tuning</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      code {
+        background: #e7e8e2;
+        border-radius: 5px;
+      }
+
+      li { line-height: 2em; }
+
+      strong { color: red; }
+
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+        right: 3em;
+      }
+
+      .logos img {
+        height: 140px;
+      }
+
+      .vdom img {
+        height: 400px;
+      }
+
+      .left-column {
+        color: #777;
+        width: 20%;
+        float: left;
+      }
+
+      .left-column h2:last-of-type, .left-column h3:last-child {
+        color: #000;
+      }
+
+      .right-column {
+        width: 75%;
+        float: right;
+      }
+
+      .native-view {
+        position: absolute;
+        right: 170px;
+        bottom: 130px;
+        width: 80px;
+        background-color: white;
+        text-align: center;
+      }
+
+      .video-problem-img img {
+        width: 600px;
+      }
+
+      .prevent-diff img {
+        width: 80%;
+      }
+
+      .bridge img {
+        width: 600px;
+      }
+    </style>
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# React Native Performance Tuning
+Ray Shih
+
+---
+
+# TL;DR
+
+- React Native is fast, kind of magic.
+- Doesn't mean you don't need to know android framework
+
+![image](./img/dr_strange_script.png)
+
+.footnote[Ref: <http://www.moviequotesandmore.com/doctor-strange-new-trailer>]
+
+---
+
+# Me
+
+- My name is Ray Shih
+- M.S. from NTU CSIE
+- Worked at WOOMOO
+- Working at Mobiusbobs
+- Fullstack Software Engineer, including mobile
+
+.logos[
+  ![image](./img/pop_logo.png)
+  ![image](./img/pamily_logo.png)
+]
+
+---
+
+# Outline
+
+- What is React Native
+- Why React Native?
+- Measure Performance
+- Performance problem of Java realm
+- Performance problem of JS(React) realm
+- Performance problem of React Native
+- Conclusion
+
+---
+
+class: center, middle
+
+# What is React Native
+
+---
+
+class: center, middle
+
+# What is React
+
+---
+
+class: center, middle
+
+# `Data -> View`
+
+---
+
+class: center
+
+# **VDom**
+
+.vdom[![image](./img/vdom.jpg)]
+
+.footnote[
+Ref: <http://reactjs.de/posts/virtuelles-dom-mit-react-js>
+]
+
+---
+
+.left-column[
+## What is React
+]
+
+.right-column[
+- `Data -> View`
+- **VDom**
+]
+
+---
+
+.left-column[
+## What is React
+## What is React Native
+]
+
+.right-column[
+- `Data -> View`
+- **VDom**
+- React Native is just React without with DOM, but **Native View**
+]
+
+---
+
+class: center
+
+# **VDom** with **Native View**
+
+.vdom[![image](./img/vdom.jpg)]
+
+.native-view[
+**Native View**
+]
+
+.footnote[
+Ref: <http://reactjs.de/posts/virtuelles-dom-mit-react-js>
+]
+
+---
+
+# Why React Native?
+
+- Don't need to parse JSON! Yeah! (well...with risk)
+- Easier to scale (in terms of architecture)
+	- Declarative way to write view
+	- SSOT is easy to understand
+- Shorter iteration, faster development especially for views themselves
+- It's **Native**
+- *Facebook* uses it
+
+---
+
+class: center, middle
+
+# You cannot **optimize**<br>what you cannot **measure**.
+
+---
+
+# Measure Performance
+
+- Systrace
+- Just console.log
+- As a user
+
+---
+
+# Systrace
+
+![image](./img/SystraceWellBehaved.png)
+
+.footnote[
+Ref: <https://facebook.github.io/react-native/docs/android-ui-performance.html>
+]
+
+---
+
+# Performance problem of Java realm
+
+- The video problem
+
+.video-problem-img[
+![image](./img/dont-use-mediaplayer-reset.png)
+]
+
+.footnote[
+Ref: [commit diff](https://github.com/rayshih/react-native-video/commit/7d89f4b1c8e0fa23ce1cfb31c3f9821fb58479ac#diff-e971272a051c4ba241583904cf81ff0aL119)
+]
+
+
+---
+
+class: center, middle
+
+# Performance problem of JS(React) realm
+
+---
+
+class: center, middle
+
+# React is **FAST**, because of **VDom**
+
+# `Data -> View`
+
+---
+
+# React is fast, because of vdom
+
+- Manipulate actual view is slow
+- List of data updated -> Clear list view and rerender
+
+---
+
+class: center, middle
+
+# React is **SLOW**, because of **VDom** (what?)
+
+---
+
+# React is slow, because of vdom
+
+- Because vdom diff still take time
+- Should use **`shouldComponentUpdate`**
+
+---
+
+class: center, middle
+
+.prevent-diff[
+![image](./img/prevent-diff.png)
+]
+
+.footnote[
+source: <http://calendar.perfplanet.com/2013/diff/>
+]
+
+---
+
+class: middle
+
+# **shouldComponentUpdate**
+
+```javascript
+shouldComponentUpdate(nextProps, nextState) {
+  return this.props !== nextProps
+}
+
+```
+
+---
+
+class: middle
+
+# **shouldComponentUpdate**
+
+```javascript
+shouldComponentUpdate(nextProps, nextState) {
+  return this.props !== nextProps
+}
+
+```
+
+- Doesn't make sense to manually write this every time.
+
+---
+
+class: center, middle
+
+# So we choose **fun-react**
+
+---
+
+class: middle
+
+# Function as React Component
+
+```jsx
+const MyView = ({title, description}) => (
+  <View>
+    <Text>{title}</Text>
+    <Text>{description}</Text>
+  </View>
+)
+```
+
+---
+
+class: middle
+
+# shouldComponentUpdate
+
+```jsx
+class MyView extends Component {
+  shouldComponentUpdate(nextProps) {
+    return this.props.title !== nextProps.title ||
+      this.props.description !== nextProps.description
+  }
+
+  render() {
+    const {title, description} = this.props
+    return (
+      <View>
+        <Text>{title}</Text>
+        <Text>{description}</Text>
+      </View>
+    )
+  }
+}
+```
+
+---
+
+class: middle
+
+# `createView` of fun-react
+
+```jsx
+const MyView = createView('MyView', ({title, description}) => (
+  <View>
+    <Text>{title}</Text>
+    <Text>{description}</Text>
+  </View>
+))
+```
+
+- by <del>magic</del> shallow diff on `props`
+
+---
+
+# So we choose fun-react
+
+- `createView`
+    - No need to write `shouldComponentUpdate` any more
+
+---
+
+class: center, middle
+
+# But **Global Single State** may cause performance problem
+
+SSOT don't need to be global single state.
+
+---
+
+class: middle
+
+# `component` of fun-react
+(borrowed from cycle-react)
+
+```jsx
+const Form = component('Form', ({interactions, event}, props) => {
+  const text$ = interactions.get('ON_TEXT_CHANGED')
+  const onSubmit$ = interactions.get('ON_SUBMIT')
+
+  onSubmit$
+    .withLatestFrom(text$, (evt, text) => text)
+    .subscribe(event(Msg.Press))
+
+  return text$.startWith('').map(text => (
+    <View>
+      <TextInput
+         value={text}
+         onChangeText={interactions.listener('ON_TEXT_CHANGED')} />
+      <Button onPress={interactions.listener('ON_SUBMIT')}>Submit</Button>
+    </View>
+  ))
+})
+```
+
+---
+
+# So we choose fun-react
+
+- `createView`
+    - No need to write `shouldComponentUpdate` any more
+- `component`
+    - Local state is an option
+    - We can leverage all the power of Rx
+
+---
+
+# So we choose fun-react
+
+- `createView`
+    - No need to write `shouldComponentUpdate` any more
+- `component`
+    - Local state is an option
+    - We can leverage all the power of Rx
+- and simpler event handler
+- <https://github.com/rayshih/fun-react>
+
+---
+
+class: center, middle
+
+# **Rx** is not a silver bullet
+
+---
+
+# **Rx** is not a silver bullet
+
+```js
+const s$ = new Rx.Subject()
+
+const a$ = s$.map(x => x + 1)
+const b$ = s$.map(x => x * 2)
+
+a$.combineLatest(b$)
+  .subscribe(console.log)
+
+s$.onNext(1)
+
+// [2, 2]
+
+s$.onNext(2)
+
+// [3, 2]
+// [3, 4]
+
+```
+
+- hotfix: `throttle`
+- or `zip`
+- or don't split your data stream if not necessary
+
+---
+
+# Performance problem of React Native
+
+- Bridge is slow
+
+.bridge[
+  ![image](./img/react-native-bridge.png)
+]
+
+.footnote[
+source: <https://goo.gl/EAeYB8>
+]
+
+---
+
+# Performance problem of React Native
+
+- Bridge is slow
+- Avoid across bridge
+	- LayoutAnimation
+	- Fallback to pure native solution
+
+- Avoid VDOM diff: `setNativeProps`
+
+---
+
+# Different Navigation
+
+- Replace vs Animated
+- Don't need to trigger render views are not on the screen
+
+---
+
+# Animation problem
+
+- `runAfterInteraction`
+- Upgrade, upgrade and upgrade
+
+---
+
+# `runAfterInteraction`
+
+```js
+componentDidMount() {
+  InteractionManager.runAfterInteractions(() => {
+    this.setState({renderPlaceholderOnly: false});
+  });
+}
+
+render() {
+  if (this.state.renderPlaceholderOnly) {
+    return this._renderPlaceholderView();
+  }
+
+  return (
+    <View>
+      <Text>Your full view goes here</Text>
+    </View>
+  );
+}
+```
+
+---
+
+# Upgrade, upgrade and upgrade
+
+Get performance improvement for free (kind of)
+
+- 0.37.0:
+    - Enable native animations when possible in NavigationExperimental (f9779e3) - @ericvicenti
+
+- 0.38.0:
+    - Use native animations in TouchableBounce and TouchableOpacity (1bb323e) - @skevy
+
+---
+
+# Conclusion
+
+- React Native may be fast or slow, depends on how well you understand your tool.
+- Don't guess or hotfix too early, please do find the root cause.
+- Do upgrade, including your knowledge.
+
+    </textarea>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js">
+    </script>
+    <script>
+var slideshow = remark.create({
+  highlightStyle: 'monokai',
+});
+    </script>
+  </body>
+</html>
